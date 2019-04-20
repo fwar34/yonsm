@@ -1,0 +1,571 @@
+---
+date: 2019-04-19
+tags: 
+- org
+author: feng
+layout: post
+title: learn lisp org2jekyll
+excerpt: Test
+categories: 
+- org
+---
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1">learn function</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1">symbol #' and symbol-value symbol-function</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defun</span> <span style="color: #87D700;">double</span><span style="color: #5FD7FF;">(</span><span style="color: #c0afa7;">x</span><span style="color: #5FD7FF;">)</span> <span style="color: #5FD7FF;">(</span><span style="color: #e0a0bc;">*</span> <span style="color: #c0afa7;">x</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7c0b9;">double</span> <span style="color: #AF87FF;">1</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">equal</span> <span style="color: #FF1493;">#'</span><span style="color: #a7c0b9;">double</span> <span style="color: #5FD7FF;">(</span><span style="color: #99bbb4;">car</span> <span style="color: #87D700;">(</span><span style="color: #b3c0a7;">list</span> <span style="color: #FF1493;">#'</span><span style="color: #a7c0b9;">double</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">lambda</span><span style="color: #87D700;">(</span><span style="color: #c0afa7;">x</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #e0a0bc;">*</span> <span style="color: #c0afa7;">x</span> <span style="color: #AF87FF;">2</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #a7c0b9;">double</span> <span style="color: #AF87FF;">2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0a7bd;">symbol-value</span> <span style="color: #FF1493;">'</span><span style="color: #a7c0b9;">double</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">symbol-function</span> <span style="color: #FF1493;">'</span><span style="color: #a7c0b9;">double</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #e0d0a0;">fun1</span> <span style="color: #FF1493;">#'</span><span style="color: #a7c0b9;">double</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #c0afa7;">x</span> <span style="color: #FF1493;">#'</span><span style="color: #a7aac0;">append</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">equal</span> <span style="color: #5FD7FF;">(</span><span style="color: #c0a7bd;">symbol-value</span> <span style="color: #FF1493;">'</span><span style="color: #c0afa7;">x</span><span style="color: #5FD7FF;">)</span> <span style="color: #5FD7FF;">(</span><span style="color: #a6bb99;">symbol-function</span> <span style="color: #FF1493;">'</span><span style="color: #a7aac0;">append</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setf</span> <span style="color: #5FD7FF;">(</span><span style="color: #a6bb99;">symbol-function</span> <span style="color: #FF1493;">#'</span><span style="color: #a7c0b9;">double</span><span style="color: #5FD7FF;">)</span> <span style="color: #FF1493;">#'</span><span style="color: #5FD7FF;">(</span><span style="color: #e0a0bc;">lambda</span><span style="color: #87D700;">(</span><span style="color: #c0afa7;">x</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #e0a0bc;">*</span> <span style="color: #c0afa7;">x</span> <span style="color: #AF87FF;">3</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7c0b9;">double</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+
+<p>
+
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2">function call</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+下面几个函数调用都是相同的作用，调用了函数+
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">+</span> <span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">apply</span> <span style="color: #FF1493;">#'</span><span style="color: #e0d0a0;">+</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">apply</span> <span style="color: #5FD7FF;">(</span><span style="color: #a6bb99;">symbol-function</span> <span style="color: #FF1493;">'</span><span style="color: #e0d0a0;">+</span><span style="color: #5FD7FF;">)</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">apply</span> <span style="color: #FF1493;">#'</span><span style="color: #5FD7FF;">(</span><span style="color: #e0a0bc;">lambda</span><span style="color: #87D700;">(</span><span style="color: #c0afa7;">x</span> <span style="color: #bba699;">y</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #e0d0a0;">+</span> <span style="color: #c0afa7;">x</span> <span style="color: #bba699;">y</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">apply</span> <span style="color: #FF1493;">#'</span><span style="color: #e0d0a0;">+</span> <span style="color: #AF87FF;">1</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">funcall</span> <span style="color: #FF1493;">#'</span><span style="color: #e0a0bc;">*</span> <span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3">#' mapcar</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #9999bb;">mapcar</span> <span style="color: #FF1493;">#'</span><span style="color: #5FD7FF;">(</span><span style="color: #e0a0bc;">lambda</span><span style="color: #87D700;">(</span><span style="color: #c0afa7;">x</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #e0d0a0;">+</span> <span style="color: #c0afa7;">x</span> <span style="color: #AF87FF;">10</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">3</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">mapcar</span> <span style="color: #FF1493;">#'</span><span style="color: #e0d0a0;">+</span>
+        <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">3</span><span style="color: #5FD7FF;">)</span>
+        <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">10</span> <span style="color: #AF87FF;">100</span> <span style="color: #AF87FF;">1000</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">sort</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">4</span> <span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">5</span> <span style="color: #AF87FF;">7</span> <span style="color: #AF87FF;">3</span><span style="color: #5FD7FF;">)</span> <span style="color: #FF1493;">#'</span><span style="color: #bb99b4;">&lt;</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">apply</span> <span style="color: #FF1493;">#'</span><span style="color: #bb99b4;">&lt;</span> <span style="color: #5FD7FF;">(</span><span style="color: #a6bb99;">sort</span> <span style="color: #FF1493;">'</span><span style="color: #87D700;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">5</span> <span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">3</span> <span style="color: #AF87FF;">7</span><span style="color: #87D700;">)</span> <span style="color: #FF1493;">#'</span><span style="color: #bb99b4;">&lt;</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">remove-if</span> <span style="color: #FF1493;">#'</span><span style="color: #b3c0a7;">evenp</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">3</span> <span style="color: #AF87FF;">4</span> <span style="color: #AF87FF;">5</span> <span style="color: #AF87FF;">6</span> <span style="color: #AF87FF;">7</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defun</span> <span style="color: #87D700;">our-remove-if</span><span style="color: #5FD7FF;">(</span><span style="color: #a7aac0;">fn</span> <span style="color: #e0a0bc;">lst</span><span style="color: #5FD7FF;">)</span>
+<span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">if</span> <span style="color: #87D700;">(</span><span style="color: #a3e0a0;">null</span> <span style="color: #e0a0bc;">lst</span><span style="color: #87D700;">)</span>
+    <span style="color: #bb99b4;">nil</span>
+    <span style="color: #87D700;">(</span><span style="color: #FF1493;">if</span> <span style="color: #CDC673;">(</span><span style="color: #c0afa7;">funcall</span> <span style="color: #a7aac0;">fn</span> <span style="color: #FF8C00;">(</span><span style="color: #99bbb4;">car</span> <span style="color: #e0a0bc;">lst</span><span style="color: #FF8C00;">)</span><span style="color: #CDC673;">)</span>
+        <span style="color: #CDC673;">(</span><span style="color: #b6a0e0;">our-remove-if</span> <span style="color: #a7aac0;">fn</span> <span style="color: #FF8C00;">(</span><span style="color: #c0a7bd;">cdr</span> <span style="color: #e0a0bc;">lst</span><span style="color: #FF8C00;">)</span><span style="color: #CDC673;">)</span>
+    <span style="color: #CDC673;">(</span><span style="color: #a0d6e0;">cons</span> <span style="color: #FF8C00;">(</span><span style="color: #99bbb4;">car</span> <span style="color: #e0a0bc;">lst</span><span style="color: #FF8C00;">)</span> <span style="color: #FF8C00;">(</span><span style="color: #b6a0e0;">our-remove-if</span> <span style="color: #a7aac0;">fn</span> <span style="color: #FF1493;">(</span><span style="color: #c0a7bd;">cdr</span> <span style="color: #e0a0bc;">lst</span><span style="color: #FF1493;">)</span><span style="color: #FF8C00;">)</span><span style="color: #CDC673;">)</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b6a0e0;">our-remove-if</span> <span style="color: #FF1493;">#'</span><span style="color: #b3c0a7;">evenp</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">3</span> <span style="color: #AF87FF;">4</span> <span style="color: #AF87FF;">5</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+(setq org-src-fontify-natively t)
+(w32-version)
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4">lambda</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+用funcall调用lambda表达式，还可以把lambda赋给一个变量然后在用funcall调用
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">funcall</span> <span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">lambda</span><span style="color: #87D700;">(</span><span style="color: #bba699;">name</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"Hello %s!"</span> <span style="color: #bba699;">name</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span> <span style="color: #CDC673;">"Emacs"</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">funcall</span> <span style="color: #FF1493;">#'</span><span style="color: #5FD7FF;">(</span><span style="color: #e0a0bc;">lambda</span><span style="color: #87D700;">(</span><span style="color: #bba699;">name</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"Hello %s!"</span> <span style="color: #bba699;">name</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span> <span style="color: #CDC673;">"Emacs"</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #c0afa7;">foo</span> <span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">lambda</span><span style="color: #87D700;">(</span><span style="color: #bba699;">name</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"Hello %s!"</span> <span style="color: #bba699;">name</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #c0afa7;">foo</span> <span style="color: #FF1493;">#'</span><span style="color: #5FD7FF;">(</span><span style="color: #e0a0bc;">lambda</span><span style="color: #87D700;">(</span><span style="color: #bba699;">name</span><span style="color: #87D700;">)</span> <span style="color: #87D700;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"Hello %s!"</span> <span style="color: #bba699;">name</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">funcall</span> <span style="color: #c0afa7;">foo</span> <span style="color: #CDC673;">"Emacs"</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2">learn variable</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1">setq and defvar</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+defvar 与 setq 所不同的是，如果变量在声明之前，这个变量已经有一个值的话， 用 defvar 
+声明的变量值不会改变成声明的那个值。另一个区别是 defvar 可以为变量提供文档字符串， 
+当变量是在文件中定义的话，C-h v 后能给出变量定义的位置。
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #c0afa7;">foo</span> <span style="color: #CDC673;">"I am foo"</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defvar</span> <span style="color: #FF8C00;">foo</span> <span style="color: #CDC673;">"Did I have a value?"</span>
+ <span style="color: #CDC673;">"A demo variable"</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2">let and let*</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+如果没有局部作用域的变量，都使用全局变量，函数会相当难写。elisp 里可以用 let 和 let* 进行局部变量的绑定。let 使用的形式是：
+(let (bindings) body) bingdings 可以是 (var value) 这样对 var 赋初始值的形式，或者用 var 声明一个初始值为 nil 的变量
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defun</span> <span style="color: #87D700;">circle-area</span><span style="color: #5FD7FF;">(</span><span style="color: #e0d0a0;">radix</span><span style="color: #5FD7FF;">)</span>
+  <span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">let</span> <span style="color: #87D700;">(</span><span style="color: #CDC673;">(</span><span style="color: #c0afa7;">pi</span> <span style="color: #AF87FF;">3.1415926</span><span style="color: #CDC673;">)</span> <span style="color: #a7c0b9;">area</span><span style="color: #87D700;">)</span>
+    <span style="color: #87D700;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #a7c0b9;">area</span> <span style="color: #CDC673;">(</span><span style="color: #e0a0bc;">*</span> <span style="color: #c0afa7;">pi</span> <span style="color: #e0d0a0;">radix</span> <span style="color: #e0d0a0;">radix</span><span style="color: #CDC673;">)</span><span style="color: #87D700;">)</span>
+    <span style="color: #87D700;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"&#30452;&#24452;&#20026; %.2f &#30340;&#22278;&#30340;&#38754;&#31215;&#26159; %.2f"</span> <span style="color: #e0d0a0;">radix</span> <span style="color: #a7c0b9;">area</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0a0bc;">circle-area</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">let* &#21644; let &#30340;&#20351;&#29992;&#24418;&#24335;&#23436;&#20840;&#30456;&#21516;&#65292;&#21807;&#19968;&#30340;&#21306;&#21035;&#26159;&#22312; let* &#22768;&#26126;&#20013;&#23601;&#33021;&#20351;&#29992;&#21069;&#38754;&#22768;&#26126;&#30340;&#21464;&#37327;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defun</span> <span style="color: #87D700;">circle-area2</span><span style="color: #5FD7FF;">(</span><span style="color: #e0d0a0;">radix</span><span style="color: #5FD7FF;">)</span>
+  <span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">let*</span> <span style="color: #87D700;">(</span><span style="color: #CDC673;">(</span><span style="color: #c0afa7;">pi</span> <span style="color: #AF87FF;">3.1415926</span><span style="color: #CDC673;">)</span> <span style="color: #CDC673;">(</span><span style="color: #a7c0b9;">area</span> <span style="color: #FF8C00;">(</span><span style="color: #e0a0bc;">*</span> <span style="color: #c0afa7;">pi</span> <span style="color: #e0d0a0;">radix</span> <span style="color: #e0d0a0;">radix</span><span style="color: #FF8C00;">)</span><span style="color: #CDC673;">)</span><span style="color: #87D700;">)</span>
+  <span style="color: #87D700;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"&#30452;&#24452;&#20026; %.2f &#30340;&#22278;&#30340;&#38754;&#31215;&#26159; %.2f"</span> <span style="color: #e0d0a0;">radix</span> <span style="color: #a7c0b9;">area</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a0d6e0;">circle-area2</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3">控制结构</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1">progn</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">progn</span> <span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #c0afa7;">foo</span> <span style="color: #AF87FF;">3</span><span style="color: #5FD7FF;">)</span> <span style="color: #5FD7FF;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"foo set to 3"</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2">if 和 cond</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">if</span> <span style="color: #a3e0a0;">condition</span>
+  <span style="color: #c0afa7;">then</span>
+ <span style="color: #a6bb99;">else</span><span style="color: #AF87FF;">)</span>
+
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">cond</span> <span style="color: #5FD7FF;">(</span><span style="color: #a7c0b9;">case1</span> <span style="color: #bba699;">do-when-case1</span><span style="color: #5FD7FF;">)</span>
+<span style="color: #5FD7FF;">(</span><span style="color: #a0d6e0;">case2</span> <span style="color: #e0d0a0;">do-when-case2</span><span style="color: #5FD7FF;">)</span>
+<span style="color: #9999bb;">...</span>
+<span style="color: #5FD7FF;">(</span><span style="color: #a0d6e0;">t</span> <span style="color: #99bbb4;">do-when-none-meet</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+<p>
+还有两个宏 when 和 unless，从它们的名字也就能知道它们是作什么用的。
+使用这两个宏的好处是使代码可读性提高，when 能省去 if 里的 progn 结构，unless 省去条件为真子句需要的的 nil 表达式。
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3">while</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">while</span> <span style="color: #a3e0a0;">condition</span>
+  <span style="color: #a6bb99;">body</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4">逻辑运算</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+条件的逻辑运算和其它语言都是很类似的， 使用 and、or、not。and 和 or 也同样具有短路性质。
+很多人喜欢在表达式短时，用 and 代替 when，or 代替 unless。 
+当然这时一般不关心它们的返回值，而是在于表达式其它子句的副作用。 比如 or 经常用于设置函数的缺省值，而 and 常用于参数检查：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defun</span> <span style="color: #87D700;">hello-world</span><span style="color: #5FD7FF;">(</span><span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #bba699;">name</span><span style="color: #5FD7FF;">)</span>
+  <span style="color: #5FD7FF;">(</span><span style="color: #FF1493;">or</span> <span style="color: #bba699;">name</span> <span style="color: #87D700;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #bba699;">name</span> <span style="color: #CDC673;">"Emacs"</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span>
+  <span style="color: #5FD7FF;">(</span><span style="color: #99bbb4;">message</span> <span style="color: #CDC673;">"Hello %s!"</span> <span style="color: #bba699;">name</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">hello-world</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">hello-world</span> <span style="color: #CDC673;">"Elisp"</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5">函数列表</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defun</span> <span style="color: #87D700;">NAME</span> <span style="color: #a7c0b9;">ARGLIST</span> <span style="color: #5FD7FF;">[</span><span style="color: #c0a7bd;">DOCSTRING</span><span style="color: #5FD7FF;">]</span> <span style="color: #a7aac0;">BODY...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defvar</span> <span style="color: #FF8C00;">SYMBOL</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #bb99b4;">INITVALUE</span> <span style="color: #c0a7bd;">DOCSTRING</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #c0a7bd;">SYM</span> <span style="color: #99bbb4;">VAL</span> <span style="color: #c0a7bd;">SYM</span> <span style="color: #99bbb4;">VAL</span> <span style="color: #9999bb;">...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">let</span> <span style="color: #a3e0a0;">VARLIST</span> <span style="color: #a7aac0;">BODY...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">let*</span> <span style="color: #a3e0a0;">VARLIST</span> <span style="color: #a7aac0;">BODY...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">lambda</span> <span style="color: #a6bb99;">ARGS</span> <span style="color: #5FD7FF;">[</span><span style="color: #c0a7bd;">DOCSTRING</span><span style="color: #5FD7FF;">]</span> <span style="color: #5FD7FF;">[</span><span style="color: #b3c0a7;">INTERACTIVE</span><span style="color: #5FD7FF;">]</span> <span style="color: #a3e0a0;">BODY</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">progn</span> <span style="color: #a3e0a0;">BODY</span> <span style="color: #9999bb;">...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">if</span> <span style="color: #a3e0a0;">COND</span> <span style="color: #e0d0a0;">THEN</span> <span style="color: #a0d6e0;">ELSE...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">cond</span> <span style="color: #a3e0a0;">CLAUSES...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">when</span> <span style="color: #a3e0a0;">COND</span> <span style="color: #a3e0a0;">BODY</span> <span style="color: #9999bb;">...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">unless</span> <span style="color: #a3e0a0;">COND</span> <span style="color: #a3e0a0;">BODY</span> <span style="color: #9999bb;">...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">when</span> <span style="color: #a3e0a0;">COND</span> <span style="color: #a3e0a0;">BODY</span> <span style="color: #9999bb;">...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">or</span> <span style="color: #b6a0e0;">CONDITIONS</span> <span style="color: #9999bb;">...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #FF1493;">and</span> <span style="color: #b6a0e0;">CONDITIONS</span> <span style="color: #9999bb;">...</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">not</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6">基本数据类型</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1">函数列表</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#27979;&#35797;&#20989;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bba699;">integerp</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">floatp</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0a7bd;">numberp</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bba699;">zerop</span> <span style="color: #a0d6e0;">NUMBER</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7aac0;">wholenump</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#27604;&#36739;&#20989;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">&gt;</span> <span style="color: #a3e0a0;">NUM1</span> <span style="color: #99bbb4;">NUM2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">&lt;</span> <span style="color: #a3e0a0;">NUM1</span> <span style="color: #99bbb4;">NUM2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">&gt;=</span> <span style="color: #a3e0a0;">NUM1</span> <span style="color: #99bbb4;">NUM2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">&lt;=</span> <span style="color: #a3e0a0;">NUM1</span> <span style="color: #99bbb4;">NUM2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">=</span> <span style="color: #a3e0a0;">NUM1</span> <span style="color: #99bbb4;">NUM2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">eql</span> <span style="color: #c0afa7;">OBJ1</span> <span style="color: #a7aac0;">OBJ2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">/=</span> <span style="color: #a3e0a0;">NUM1</span> <span style="color: #99bbb4;">NUM2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#36716;&#25442;&#20989;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">float</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a3e0a0;">truncate</span> <span style="color: #b3c0a7;">ARG</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #c0a7bd;">DIVISOR</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">floor</span> <span style="color: #b3c0a7;">ARG</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #c0a7bd;">DIVISOR</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b6a0e0;">ceiling</span> <span style="color: #b3c0a7;">ARG</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #c0a7bd;">DIVISOR</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">round</span> <span style="color: #b3c0a7;">ARG</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #c0a7bd;">DIVISOR</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#36816;&#31639;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">+</span> <span style="color: #5FD7FF;">&amp;rest</span> <span style="color: #a6bb99;">NUMBERS-OR-MARKERS</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7c0b9;">-</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #bba699;">NUMBER-OR-MARKER</span> <span style="color: #5FD7FF;">&amp;rest</span> <span style="color: #bb99b4;">MORE-NUMBERS-OR-MARKERS</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0a0bc;">*</span> <span style="color: #5FD7FF;">&amp;rest</span> <span style="color: #a6bb99;">NUMBERS-OR-MARKERS</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7c0b9;">/</span> <span style="color: #a6bb99;">DIVIDEND</span> <span style="color: #c0a7bd;">DIVISOR</span> <span style="color: #5FD7FF;">&amp;rest</span> <span style="color: #b6a0e0;">DIVISORS</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0a7bd;">1+</span> <span style="color: #a0d6e0;">NUMBER</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">1-</span> <span style="color: #a0d6e0;">NUMBER</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">abs</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0a0bc;">%</span> <span style="color: #c0afa7;">X</span> <span style="color: #a7aac0;">Y</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">mod</span> <span style="color: #c0afa7;">X</span> <span style="color: #a7aac0;">Y</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">sin</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">cos</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7c0b9;">tan</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a3e0a0;">asin</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a3e0a0;">acos</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b6a0e0;">atan</span> <span style="color: #a7aac0;">Y</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #c0afa7;">X</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0a7bd;">sqrt</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">exp</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">expt</span> <span style="color: #a7aac0;">ARG1</span> <span style="color: #bb99b4;">ARG2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a0d6e0;">log</span> <span style="color: #b3c0a7;">ARG</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #b6a0e0;">BASE</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">log10</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">logb</span> <span style="color: #b3c0a7;">ARG</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#38543;&#26426;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a0d6e0;">random</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #a6bb99;">N</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2">变量列表</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #a7c0b9;">most-positive-fixnum</span>
+<span style="color: #a3e0a0;">most-negative-fixnum</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7">字符和字符串</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+<a href="http://www.woola.net/detail/2016-08-23-elisp-string.html">http://www.woola.net/detail/2016-08-23-elisp-string.html</a>
+</p>
+</div>
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1">测试函数</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+字符串测试使用 stringp，没有 charp，因为字符就是整数。 string-or-null-p 当对象是一个字符或 
+nil 时返回 t。 char-or-string-p 测试是否是字符串或者字符类型。
+比较头疼的是 emacs 没有测试字符串是否为空的函数。这是我用的这个测试函数，使用前要测试字符串是否为 nil：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">defun</span> <span style="color: #87D700;">string-emptyp</span><span style="color: #5FD7FF;">(</span><span style="color: #b6a0e0;">str</span><span style="color: #5FD7FF;">)</span>
+  <span style="color: #5FD7FF;">(</span><span style="color: #9999bb;">not</span> <span style="color: #87D700;">(</span><span style="color: #9999bb;">string&lt;</span> <span style="color: #CDC673;">""</span> <span style="color: #b6a0e0;">str</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2">函数列表</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+<a href="http://www.woola.net/detail/2016-08-23-elisp-string.html">http://www.woola.net/detail/2016-08-23-elisp-string.html</a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#27979;&#35797;&#20989;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">stringp</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">string-or-null-p</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b6a0e0;">char-or-string-p</span> <span style="color: #c0afa7;">OBJECT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#26500;&#24314;&#20989;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0a0bc;">make-string</span> <span style="color: #e0a0bc;">LENGTH</span> <span style="color: #e0d0a0;">INIT</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">string</span> <span style="color: #5FD7FF;">&amp;rest</span> <span style="color: #99bbb4;">CHARACTERS</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a3e0a0;">substring</span> <span style="color: #bb99b4;">STRING</span> <span style="color: #c0afa7;">FROM</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #a6bb99;">TO</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0a7bd;">concat</span> <span style="color: #5FD7FF;">&amp;rest</span> <span style="color: #b6a0e0;">SEQUENCES</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#27604;&#36739;&#20989;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">char-equal</span> <span style="color: #a3e0a0;">C1</span> <span style="color: #a0d6e0;">C2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">string=</span> <span style="color: #a7c0b9;">S1</span> <span style="color: #c0a7bd;">S2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">string-equal</span> <span style="color: #a7c0b9;">S1</span> <span style="color: #c0a7bd;">S2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">string&lt;</span> <span style="color: #a7c0b9;">S1</span> <span style="color: #c0a7bd;">S2</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#36716;&#25442;&#20989;&#25968;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #bba699;">char-to-string</span> <span style="color: #bb99b4;">CHAR</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">string-to-char</span> <span style="color: #bb99b4;">STRING</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">number-to-string</span> <span style="color: #a0d6e0;">NUMBER</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b6a0e0;">string-to-number</span> <span style="color: #bb99b4;">STRING</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #b6a0e0;">BASE</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">downcase</span> <span style="color: #a7aac0;">OBJ</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #9999bb;">upcase</span> <span style="color: #a7aac0;">OBJ</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">capitalize</span> <span style="color: #a7aac0;">OBJ</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7aac0;">upcase-initials</span> <span style="color: #a7aac0;">OBJ</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a0d6e0;">format</span> <span style="color: #bb99b4;">STRING</span> <span style="color: #5FD7FF;">&amp;rest</span> <span style="color: #e0a0bc;">OBJECTS</span><span style="color: #AF87FF;">)</span>
+<span style="color: #8B8878;">;; </span><span style="color: #8B8878;">&#26597;&#25214;&#19982;&#26367;&#25442;</span>
+<span style="color: #AF87FF;">(</span><span style="color: #e0d0a0;">string-match</span> <span style="color: #b6a0e0;">REGEXP</span> <span style="color: #bb99b4;">STRING</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #e0a0bc;">START</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a7c0b9;">replace-match</span> <span style="color: #99bbb4;">NEWTEXT</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #a3e0a0;">FIXEDCASE</span> <span style="color: #b6a0e0;">LITERAL</span> <span style="color: #bb99b4;">STRING</span> <span style="color: #a7aac0;">SUBEXP</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">replace-regexp-in-string</span> <span style="color: #b6a0e0;">REGEXP</span> <span style="color: #a0d6e0;">REP</span> <span style="color: #bb99b4;">STRING</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #a3e0a0;">FIXEDCASE</span> <span style="color: #b6a0e0;">LITERAL</span> <span style="color: #a7aac0;">SUBEXP</span> <span style="color: #e0a0bc;">START</span><span style="color: #AF87FF;">)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #c0afa7;">subst-char-in-string</span> <span style="color: #99bbb4;">FROMCHAR</span> <span style="color: #a7c0b9;">TOCHAR</span> <span style="color: #bb99b4;">STRING</span> <span style="color: #5FD7FF;">&amp;optional</span> <span style="color: #a0d6e0;">INPLACE</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8">cons cell 和列表</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+<a href="http://www.woola.net/detail/2016-08-23-elisp-cons-cell.html">http://www.woola.net/detail/2016-08-23-elisp-cons-cell.html</a>
+</p>
+
+<p>
+如果从概念上来说，cons cell 其实非常简单的，就是两个有顺序的元素。第一个叫 CAR，第二个就 CDR。CAR 和 CDR 
+名字来自于 Lisp。它最初在IBM 704机器上的实现。在这种机器有一种取址模式，使人可以访问一个存储地址中的
+“地址（address）”部分和“减量（decrement）”部分。CAR 指令用于取出地址部分，表示(Contents of Address part of Register)，
+CDR 指令用于取出地址的减量部分(Contents of the Decrement part of Register)。cons cell 也就是 construction of 
+cells。car 函数用于取得 cons cell 的 CAR 部分，cdr 取得cons cell 的 CDR 部分。cons cell 如此简单，但是它却能衍生出许多高级的数据结构，
+比如链表，树，关联表等等。
+</p>
+
+<p>
+cons cell 的读入语法是用 . 分开两个部分，比如：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #AF87FF;">2</span><span style="color: #AF87FF;">)</span>                                <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 . 2)</span>
+<span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">?a</span> <span style="color: #b3c0a7;">.</span> <span style="color: #AF87FF;">1</span><span style="color: #AF87FF;">)</span>                               <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (97 . 1)</span>
+<span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #CDC673;">"a"</span><span style="color: #AF87FF;">)</span>                              <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 . "a")</span>
+<span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #bb99b4;">nil</span><span style="color: #AF87FF;">)</span>                              <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1)</span>
+<span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #bb99b4;">nil</span> <span style="color: #b3c0a7;">.</span> <span style="color: #bb99b4;">nil</span><span style="color: #AF87FF;">)</span>                            <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (nil)</span>
+</pre>
+</div>
+<p>
+注意到前面的表达式中都有一个 ' 号，这是什么意思呢？其实理解了 eval-last-sexp 的作用就能明白了。eval-last-sexp 
+其实包含了两个步骤，一是读入前一个 S-表达式，二是对读入的 S-表达式求值。这样如果读入的 S-表达式是一个 cons cell 的话，
+求值时会把这个 cons cell 的第一个元素作为一个函数来调用。而事实上，前面这些例子的第一个元素都不是一个函数，这样就会产生一个错误 
+invalid-function。之所以前面没有遇到这个问题，那是因为前面数字和字符串是一类特殊的 S-表达式，它们求值后和求值前是不变，
+称为自求值表达式（self-evaluating form）。' 号其实是一个特殊的函数 quote，它的作用是将它的参数返回而不作求值。'(1 . 2) 等价于 
+(quote (1 . 2))。为了证明 cons cell 的读入语法确实就是它的输出形式，可以看下面这个语句：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #e0a0bc;">read</span> <span style="color: #CDC673;">"(1 . 2)"</span><span style="color: #AF87FF;">)</span>                        <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 . 2)</span>
+</pre>
+</div>
+<p>
+列表包括了 cons cell。但是列表中有一个特殊的元素──空表 nil。
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #bb99b4;">nil</span>                                     <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; nil</span>
+<span style="color: #FF1493;">'</span><span style="color: #AF87FF;">()</span>                                     <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; nil</span>
+</pre>
+</div>
+<p>
+<b>注意</b>
+按列表最后一个 cons cell 的 CDR 部分的类型分，可以把列表分为三类。
+</p>
+<ol class="org-ol">
+<li>如果它是 nil 的话，这个列表也称为“真列表”(true list)。
+</li>
+<li>如果既不是 nil 也不是一个 cons cell，则这个列表称为“点列表”(dotted list)。
+</li>
+<li>还有一种可能，它指向列表中之前的一个 cons cell， 则称为环形列表(circular list)。
+</li>
+</ol>
+<p>
+这里分别给出一个例子：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>                                  <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 2 3) cdr-&gt;nil</span>
+<span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span> <span style="color: #b3c0a7;">.</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>                                <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 2 . 3) cdr-&gt; 3, &#26159;&#19981;nil&#20063;&#19981;&#26159;cons cell</span>
+<span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> #<span style="color: #e0a0bc;">1=</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">3</span> <span style="color: #b3c0a7;">.</span> #<span style="color: #AF87FF;">1</span>#<span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>                     <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 2 3 . #1) cdr-&gt;&#25351;&#21521;&#20043;&#21069;&#30340;&#19968;&#20010;cons cell</span>
+</pre>
+</div>
+<p>
+从这个例子可以看出前两种列表的读入语法和输出形式都是相同的，而环形列表的读入语法是很古怪的，输出形式不能作为环形列表的读入形式。
+</p>
+
+<p>
+如果把真列表最后一个 cons cell 的 nil 省略不写，也就是 (1 . nil) 简写成 (1)，把 ( obj1 . ( obj2 . list)) 
+简写成 (obj1 obj2 . list)，那么列表最后可以写成一个用括号括起的元素列表：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">2</span> <span style="color: #b3c0a7;">.</span> <span style="color: #87D700;">(</span><span style="color: #AF87FF;">3</span> <span style="color: #b3c0a7;">.</span> <span style="color: #bb99b4;">nil</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>                  <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 2 3)</span>
+</pre>
+</div>
+<p>
+尽管这样写是清爽多了，但是，我觉得看一个列表时还是在脑子里反映的前面的形式，这样在和复杂的 cons cell 打交道时就不会搞不清楚这个 
+cons cell 的 CDR 是一个列表呢，还是一个元素或者是嵌套的列表。
+</p>
+</div>
+<div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1">测试函数</h3>
+<div class="outline-text-3" id="text-8-1">
+<p>
+测试一个对象是否是 cons cell 用 consp，是否是列表用 listp。
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">consp</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>                        <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; t</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">consp</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #87D700;">(</span><span style="color: #AF87FF;">2</span> <span style="color: #b3c0a7;">.</span> <span style="color: #bb99b4;">nil</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>                <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; t</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a6bb99;">consp</span> <span style="color: #bb99b4;">nil</span><span style="color: #AF87FF;">)</span>                             <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; nil</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">listp</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>                        <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; t</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">listp</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #AF87FF;">1</span> <span style="color: #b3c0a7;">.</span> <span style="color: #87D700;">(</span><span style="color: #AF87FF;">2</span> <span style="color: #b3c0a7;">.</span> <span style="color: #bb99b4;">nil</span><span style="color: #87D700;">)</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>                <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; t</span>
+<span style="color: #AF87FF;">(</span><span style="color: #99bbb4;">listp</span> <span style="color: #bb99b4;">nil</span><span style="color: #AF87FF;">)</span>                             <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; t</span>
+</pre>
+</div>
+<p>
+没有内建的方法测试一个列表是不是一个真列表。通常如果一个函数需要一个真列表作为参数，都是在运行时发出错误，而不是进行参数检查，因为检查一个列表是真列表的代价比较高。
+测试一个对象是否是 nil 用 null 函数。只有当对象是空表时，null 才返回空值。
+</p>
+</div>
+</div>
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2">构造函数</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+生成一个 cons cell 可以用 cons 函数。比如：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #a0d6e0;">cons</span> <span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #AF87FF;">)</span>                              <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 . 2)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a0d6e0;">cons</span> <span style="color: #AF87FF;">1</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">()</span><span style="color: #AF87FF;">)</span>                            <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1)</span>
+</pre>
+</div>
+<p>
+也是在列表前面增加元素的方法。比如：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">setq</span> <span style="color: #c0afa7;">foo</span> <span style="color: #FF1493;">'</span><span style="color: #5FD7FF;">(</span><span style="color: #9999bb;">a</span> <span style="color: #9999bb;">b</span><span style="color: #5FD7FF;">)</span><span style="color: #AF87FF;">)</span>                       <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (a b)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #a0d6e0;">cons</span> <span style="color: #FF1493;">'</span><span style="color: #c0afa7;">x</span> <span style="color: #c0afa7;">foo</span><span style="color: #AF87FF;">)</span>                           <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (x a b)</span>
+</pre>
+</div>
+<p>
+值得注意的是前面这个例子的 foo 值并没有改变。事实上有一个宏 push 可以加入元素的同时改变列表的值：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #FF1493;">push</span> <span style="color: #FF1493;">'</span><span style="color: #c0afa7;">x</span> <span style="color: #c0afa7;">foo</span><span style="color: #AF87FF;">)</span>                           <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (x a b)</span>
+<span style="color: #c0afa7;">foo</span>                                     <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (x a b)</span>
+</pre>
+</div>
+<p>
+生成一个列表的函数是 list。比如：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">list</span> <span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>                            <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (1 2 3)</span>
+</pre>
+</div>
+<p>
+可能这时你有一个疑惑，前面产生一个列表，我常用 quote（也就是 ' 符号）这个函数，它和这个 cons 和 list 函数有什么区别呢？
+其实区别是很明显的，quote 是把参数直接返回不进行求值，而 list 和 cons 是对参数求值后再生成一个列表或者 cons cell。看下面这个例子：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #FF1493;">'</span><span style="color: #AF87FF;">(</span><span style="color: #5FD7FF;">(</span><span style="color: #e0d0a0;">+</span> <span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>                            <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; ((+ 1 2) 3)</span>
+<span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">list</span> <span style="color: #5FD7FF;">(</span><span style="color: #e0d0a0;">+</span> <span style="color: #AF87FF;">1</span> <span style="color: #AF87FF;">2</span><span style="color: #5FD7FF;">)</span> <span style="color: #AF87FF;">3</span><span style="color: #AF87FF;">)</span>                        <span style="color: #8B8878;">; </span><span style="color: #8B8878;">=&gt; (3 3)</span>
+</pre>
+</div>
+<p>
+前一个生成的列表的 CAR 部分是 (+ 1 2) 这个列表，而后一个是先对 (+ 1 2) 求值得到 3 后再生成列表。
+</p>
+
+
+
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">&lt;2019-03-26 周二&gt;</span></span>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-8-3" class="outline-3">
+<h3 id="sec-8-3">属性列表（property list，plist）</h3>
+<div class="outline-text-3" id="text-8-3">
+<p>
+<a href="https://blog.csdn.net/whackw/article/details/51542457">https://blog.csdn.net/whackw/article/details/51542457</a>
+这种列表中的第1个元素用来描述第2个元素，第3个元素用来描述第4个元素，以此类推，第奇数个元素都是用来描述相邻的第偶数个元素的，
+换句话说就是： 从第一个元素开始的所有相间元素都是一个用来描述接下来那个元素的符号（原文引用 ：）），在 plist 
+里奇数个元素的写法使用一种特殊的符号&#x2013;关键字符号（keyword）。
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #b3c0a7;">list</span> <span style="color: #FF1493;">:&#20070;&#21517;</span> <span style="color: #CDC673;">"&#20154;&#38388;&#35789;&#35805;"</span> <span style="color: #FF1493;">:&#20316;&#32773;</span> <span style="color: #CDC673;">"&#29579;&#22269;&#32500;"</span> <span style="color: #FF1493;">:&#20215;&#26684;</span> <span style="color: #AF87FF;">100</span> <span style="color: #FF1493;">:&#26159;&#21542;&#26377;&#30005;&#23376;&#29256;</span> <span style="color: #a0d6e0;">t</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+<p>
+这里要提到一个属性表的函数 getf ，它可以根据一个 plist 中的某个字段名（属性名）来查询对应的属性值，如下所示，
+我们想要查询刚才建立的 plist 中的 :书名 属性名所对应的属性值：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #AF87FF;">(</span><span style="color: #9999bb;">getf</span> <span style="color: #5FD7FF;">(</span><span style="color: #b3c0a7;">list</span> <span style="color: #FF1493;">:&#20070;&#21517;</span> <span style="color: #CDC673;">"&#20154;&#38388;&#35789;&#35805;"</span> <span style="color: #FF1493;">:&#20316;&#32773;</span> <span style="color: #CDC673;">"&#29579;&#22269;&#32500;"</span> <span style="color: #FF1493;">:&#20215;&#26684;</span> <span style="color: #AF87FF;">100</span> <span style="color: #FF1493;">:&#26159;&#21542;&#26377;&#30005;&#23376;&#29256;</span> <span style="color: #a0d6e0;">t</span><span style="color: #5FD7FF;">)</span> <span style="color: #FF1493;">:&#20316;&#32773;</span><span style="color: #AF87FF;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
