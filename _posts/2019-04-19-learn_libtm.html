@@ -1,0 +1,257 @@
+---
+date: 2019-04-19
+tags: 
+- libtm c++
+author: feng
+layout: post
+title: libtm代码学习
+excerpt: libtm代码的学习记录
+categories: 
+- work
+---
+
+<div id="outline-container-orge7bfeac" class="outline-2">
+<h2 id="orge7bfeac">线程对象</h2>
+<div class="outline-text-2" id="text-orge7bfeac">
+</div>
+<div id="outline-container-orgbbeda4f" class="outline-3">
+<h3 id="orgbbeda4f">IOThread</h3>
+<div class="outline-text-3" id="text-orgbbeda4f">
+<ul class="org-ul">
+<li>线程对象里面包含了如下的几个变量</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #F92672;">class</span> <span style="color: #66D9EF;">IOThread</span> : <span style="color: #F92672;">public</span> <span style="color: #66D9EF;">Object</span>, <span style="color: #F92672;">public</span> <span style="color: #66D9EF;">EventHandler</span>
+<span style="color: #AE81FF;">{</span>
+<span style="color: #F92672;">private</span>:
+    <span style="color: #66D9EF;">Schedule</span> <span style="color: #FD971F;">schedule_</span>;
+    <span style="color: #66D9EF;">Thread</span> <span style="color: #FD971F;">worker_</span>;<span style="color: #75715E;">/**</span><span style="color: #75715E;">&lt;The worker thread object */</span>
+    <span style="color: #66D9EF;">Reactor</span> <span style="color: #FD971F;">reactor_</span>;<span style="color: #75715E;">/**</span><span style="color: #75715E;">&lt;This must be the first member */</span>
+    <span style="color: #66D9EF;">SignalBox</span> <span style="color: #FD971F;">sigbox_</span>;<span style="color: #75715E;">/**</span><span style="color: #75715E;">&lt;The signal box used to communicate between Objects */</span>
+    <span style="color: #66D9EF;">tm_handle_t</span> <span style="color: #FD971F;">signal_handle_</span>;
+    <span style="color: #66D9EF;">RequestConnQueue</span> <span style="color: #FD971F;">request_queue_</span>;
+    <span style="color: #66D9EF;">tm_timer_t</span> <span style="color: #FD971F;">check_timerid_</span>;
+    <span style="color: #75715E;">// </span><span style="color: #75715E;">Indicate the number of sessions bound to this thread</span>
+    <span style="color: #66D9EF;">uint32_t</span> <span style="color: #FD971F;">load_</span>;
+    <span style="color: #66D9EF;">bool</span> <span style="color: #FD971F;">is_check_heartbeat_</span>;
+<span style="color: #AE81FF;">}</span>;
+</pre>
+</div>
+<ul class="org-ul">
+<li>在IOThread的线程函数thr_svc中将signalbox的可读事件注册到reactor中，同时注册了定时器，开始了事件循环，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #66D9EF;">void</span> <span style="color: #AE81FF;">IOThread</span>::<span style="color: #A6E22E;">thr_svc</span><span style="color: #AE81FF;">(</span><span style="color: #66D9EF;">void</span> *<span style="color: #FD971F;">args</span><span style="color: #AE81FF;">)</span>
+<span style="color: #AE81FF;">{</span>
+    <span style="color: #A6E22E;">TRANS_LOG_INFO</span><span style="color: #66D9EF;">(</span><span style="color: #E6DB74;">"Enter the tm thread(</span><span style="color: #ff4500;">%p</span><span style="color: #E6DB74;">)"</span>, <span style="color: #a6bb99;">args</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #66D9EF;">IOThread</span> *<span style="color: #FD971F;">iothr</span> = <span style="color: #66D9EF;">(</span><span style="color: #66D9EF;">IOThread</span>*<span style="color: #66D9EF;">)</span><span style="color: #a6bb99;">args</span>;
+    <span style="color: #66D9EF;">Reactor</span> *<span style="color: #FD971F;">r</span> = <span style="color: #99bbb4;">iothr</span>-&gt;<span style="color: #A6E22E;">reactor</span><span style="color: #66D9EF;">()</span>;
+    <span style="color: #99bbb4;">iothr</span>-&gt;<span style="color: #e0a0bc;">signal_handle_</span> = <span style="color: #99bbb4;">r</span>-&gt;<span style="color: #A6E22E;">AddHandler</span><span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span>-&gt;<span style="color: #bba699;">sigbox_</span>.<span style="color: #A6E22E;">signal_fd</span><span style="color: #A6E22E;">()</span>, <span style="color: #99bbb4;">iothr</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #99bbb4;">r</span>-&gt;<span style="color: #A6E22E;">RegisterEvent</span><span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span>-&gt;<span style="color: #e0a0bc;">signal_handle_</span>, <span style="color: #AE81FF;">EventHandler</span>::<span style="color: #b3c0a7;">EM_READ</span><span style="color: #66D9EF;">)</span>;
+
+    <span style="color: #75715E;">// </span><span style="color: #75715E;">Register check timer</span>
+    <span style="color: #99bbb4;">iothr</span>-&gt;<span style="color: #A6E22E;">register_check_timer</span><span style="color: #66D9EF;">()</span>;
+    <span style="color: #99bbb4;">r</span>-&gt;<span style="color: #A6E22E;">HandleEvents</span><span style="color: #66D9EF;">()</span>;
+    <span style="color: #A6E22E;">TRANS_LOG_INFO</span><span style="color: #66D9EF;">(</span><span style="color: #E6DB74;">"Leave the tm thread(</span><span style="color: #ff4500;">%p</span><span style="color: #E6DB74;">)"</span>, <span style="color: #a6bb99;">args</span><span style="color: #66D9EF;">)</span>;
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>当这个线程上面的对象发送了signal到这个线程的signalbox中后，IOThread的HandleInput被触发，开始处理signalbox中的signal，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #66D9EF;">void</span> <span style="color: #AE81FF;">IOThread</span>::<span style="color: #A6E22E;">HandleInput</span><span style="color: #AE81FF;">()</span>
+<span style="color: #AE81FF;">{</span>
+    <span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">rc</span> = <span style="color: #AE81FF;">0</span>;
+    <span style="color: #66D9EF;">Signal</span> <span style="color: #FD971F;">s</span>;
+
+    <span style="color: #bb99b4;">rc</span> = <span style="color: #bba699;">sigbox_</span>.<span style="color: #A6E22E;">recv</span><span style="color: #66D9EF;">(</span><span style="color: #a0d6e0;">s</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #F92672;">while</span><span style="color: #66D9EF;">(</span><span style="color: #bb99b4;">rc</span> == <span style="color: #AE81FF;">0</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #a0d6e0;">s</span>.<span style="color: #a7c0b9;">receiver</span>-&gt;<span style="color: #A6E22E;">process_signal</span><span style="color: #A6E22E;">(</span><span style="color: #a0d6e0;">s</span><span style="color: #A6E22E;">)</span>;
+        <span style="color: #bb99b4;">rc</span> = <span style="color: #bba699;">sigbox_</span>.<span style="color: #A6E22E;">recv</span><span style="color: #A6E22E;">(</span><span style="color: #a0d6e0;">s</span><span style="color: #A6E22E;">)</span>;
+    <span style="color: #66D9EF;">}</span>
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orga5bd464" class="outline-2">
+<h2 id="orga5bd464">tm_tp_listen逻辑</h2>
+<div class="outline-text-2" id="text-orga5bd464">
+</div>
+<div id="outline-container-org95a8c00" class="outline-3">
+<h3 id="org95a8c00">TPListenSession的逻辑</h3>
+<div class="outline-text-3" id="text-org95a8c00">
+<ul class="org-ul">
+<li>创建一个 TPListenSession 对象，调用这个对象的 Listen 函数(在 Listen 函数中会启动udp，tcp，http等的监听逻辑, 同时给 TPListenSession 对象绑定线程)<br />
+在 Listen 函数执行完成后会调用 TPListenSession 的 send_plug 函数，然后在 TPListenSession 绑定的线程触发了 TPListenSession 的 process_plug<br />
+函数， 在 process_plug 函数中会调用 udp、tcp、http 和 https 所对应的 TPListenerAdapter 对象的 send_plug 函数。最终这些函数的 process_plug <br />
+在各自绑定的线程上执行，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #66D9EF;">void</span> <span style="color: #AE81FF;">TPListenSession</span>::<span style="color: #A6E22E;">process_plug</span><span style="color: #AE81FF;">()</span>
+<span style="color: #AE81FF;">{</span>
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #e0a0bc;">udp_adps_</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #F92672;">for</span><span style="color: #A6E22E;">(</span><span style="color: #66D9EF;">uint32_t</span> <span style="color: #FD971F;">i</span> = <span style="color: #AE81FF;">0</span>; <span style="color: #b6a0e0;">i</span> &lt; <span style="color: #a6bb99;">udp_adp_num_</span>; ++<span style="color: #b6a0e0;">i</span><span style="color: #A6E22E;">){</span>
+            <span style="color: #F92672;">if</span> <span style="color: #E6DB74;">(</span><span style="color: #e0a0bc;">udp_adps_</span><span style="color: #FD971F;">[</span><span style="color: #b6a0e0;">i</span><span style="color: #FD971F;">]</span><span style="color: #E6DB74;">){</span>
+                <span style="color: #e0a0bc;">udp_adps_</span><span style="color: #FD971F;">[</span><span style="color: #b6a0e0;">i</span><span style="color: #FD971F;">]</span>-&gt;<span style="color: #A6E22E;">send_plug</span><span style="color: #FD971F;">()</span>;
+            <span style="color: #E6DB74;">}</span>
+        <span style="color: #A6E22E;">}</span>
+    <span style="color: #66D9EF;">}</span>
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #a6bb99;">tcp_adp_</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #a6bb99;">tcp_adp_</span>-&gt;<span style="color: #A6E22E;">send_plug</span><span style="color: #A6E22E;">()</span>;
+    <span style="color: #66D9EF;">}</span>
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #c0afa7;">http_adp_</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #c0afa7;">http_adp_</span>-&gt;<span style="color: #A6E22E;">send_plug</span><span style="color: #A6E22E;">()</span>;
+    <span style="color: #66D9EF;">}</span>
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #b3c0a7;">https_adp_</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #b3c0a7;">https_adp_</span>-&gt;<span style="color: #A6E22E;">send_plug</span><span style="color: #A6E22E;">()</span>;
+    <span style="color: #66D9EF;">}</span>
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>在 udp、tcp、http 和 https 各自的 TPListenerAdapter 对象的 process_plug 函数中 执行 IOHandler(UdpListener、TcpListener) 对象的 Plug <br />
+函数， 在 Plug 函数中将各自的 Handler(UdpListener、TcpListener) 的可读事件注册到线程的 Reactor 中去，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #66D9EF;">void</span> <span style="color: #AE81FF;">IOHandler</span>::<span style="color: #A6E22E;">Plug</span><span style="color: #AE81FF;">(</span><span style="color: #66D9EF;">IOThread</span> *<span style="color: #FD971F;">iothr</span><span style="color: #AE81FF;">)</span>
+<span style="color: #AE81FF;">{</span>
+    <span style="color: #75715E;">// </span><span style="color: #75715E;">If the iothread is changed, switch to new thread</span>
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #a6bb99;">io_thr_</span> = <span style="color: #99bbb4;">iothr</span>;
+    <span style="color: #66D9EF;">}</span>
+    <span style="color: #A6E22E;">add_handler</span><span style="color: #66D9EF;">()</span>;
+    <span style="color: #A6E22E;">register_event</span><span style="color: #66D9EF;">(</span><span style="color: #AE81FF;">EventHandler</span>::<span style="color: #b3c0a7;">EM_READ</span><span style="color: #66D9EF;">)</span>;
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org00ee2bd" class="outline-3">
+<h3 id="org00ee2bd">udp监听</h3>
+<div class="outline-text-3" id="text-org00ee2bd">
+<ul class="org-ul">
+<li>如果 udp 监听端口不为0则创建线程个数的 TPListenerAdapter 对象，给每个对象绑定一个不同的线程，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #75715E;">// </span><span style="color: #75715E;">listen udp</span>
+<span style="color: #F92672;">if</span> <span style="color: #AE81FF;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #e0a0bc;">udp_port</span> != <span style="color: #AE81FF;">0</span><span style="color: #AE81FF;">){</span>
+    <span style="color: #66D9EF;">uint32_t</span> <span style="color: #FD971F;">thr_num</span> = <span style="color: #AE81FF;">EventLoopManager</span>::<span style="color: #A6E22E;">TpInstance</span><span style="color: #66D9EF;">()</span>-&gt;<span style="color: #A6E22E;">thread_num</span><span style="color: #66D9EF;">()</span>;
+    <span style="color: #e0a0bc;">udp_adps_</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">TPListenerAdapter</span>*<span style="color: #66D9EF;">[</span><span style="color: #AE81FF;">thr_num</span><span style="color: #66D9EF;">]</span>;
+    <span style="color: #F92672;">for</span><span style="color: #66D9EF;">(</span><span style="color: #66D9EF;">uint32_t</span> <span style="color: #FD971F;">i</span>=<span style="color: #AE81FF;">0</span>; <span style="color: #b6a0e0;">i</span> &lt; <span style="color: #a6bb99;">thr_num</span>; ++<span style="color: #b6a0e0;">i</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #75715E;">// </span><span style="color: #75715E;">Add new udp adapter</span>
+        <span style="color: #a6bb99;">udp_adp_num_</span>++;
+        <span style="color: #e0a0bc;">udp_adps_</span><span style="color: #A6E22E;">[</span><span style="color: #b6a0e0;">i</span><span style="color: #A6E22E;">]</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">TPListenerAdapter</span><span style="color: #A6E22E;">(</span><span style="color: #F92672;">this</span><span style="color: #A6E22E;">)</span>;
+        <span style="color: #99bbb4;">iothr</span> = <span style="color: #AE81FF;">EventLoopManager</span>::<span style="color: #A6E22E;">TpInstance</span><span style="color: #A6E22E;">()</span>-&gt;<span style="color: #A6E22E;">GetIOThread</span><span style="color: #A6E22E;">(</span><span style="color: #b6a0e0;">i</span><span style="color: #A6E22E;">)</span>;
+        <span style="color: #e0a0bc;">udp_adps_</span><span style="color: #A6E22E;">[</span><span style="color: #b6a0e0;">i</span><span style="color: #A6E22E;">]</span>-&gt;<span style="color: #A6E22E;">set_io_thread</span><span style="color: #A6E22E;">(</span><span style="color: #99bbb4;">iothr</span><span style="color: #A6E22E;">)</span>;
+        <span style="color: #bb99b4;">rc</span> = <span style="color: #e0a0bc;">udp_adps_</span><span style="color: #A6E22E;">[</span><span style="color: #b6a0e0;">i</span><span style="color: #A6E22E;">]</span>-&gt;<span style="color: #A6E22E;">create_udp_send_sock</span><span style="color: #A6E22E;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a7aac0;">listen_ip</span>, <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #e0a0bc;">udp_port</span><span style="color: #A6E22E;">)</span>;
+        <span style="color: #F92672;">if</span> <span style="color: #A6E22E;">(</span><span style="color: #bb99b4;">rc</span> != <span style="color: #b6a0e0;">TM_SUCCESS</span><span style="color: #A6E22E;">)</span>
+            <span style="color: #F92672;">goto</span> <span style="color: #AE81FF;">err</span>;
+    <span style="color: #66D9EF;">}</span>
+    <span style="color: #F92672;">for</span><span style="color: #66D9EF;">(</span><span style="color: #66D9EF;">uint32_t</span> <span style="color: #FD971F;">i</span>=<span style="color: #AE81FF;">0</span>; <span style="color: #b6a0e0;">i</span> &lt; <span style="color: #a6bb99;">thr_num</span>; ++<span style="color: #b6a0e0;">i</span><span style="color: #66D9EF;">){</span>
+        <span style="color: #66D9EF;">tm_handle_t</span> <span style="color: #FD971F;">udp_lfd</span> = <span style="color: #c0afa7;">INVALID_HANDLE</span>;
+        <span style="color: #F92672;">if</span> <span style="color: #A6E22E;">(</span><span style="color: #b6a0e0;">i</span> &gt; <span style="color: #AE81FF;">0</span><span style="color: #A6E22E;">){</span>
+            <span style="color: #b3c0a7;">udp_lfd</span> = <span style="color: #e0a0bc;">udp_adps_</span><span style="color: #E6DB74;">[</span><span style="color: #AE81FF;">0</span><span style="color: #E6DB74;">]</span>-&gt;<span style="color: #A6E22E;">udp_listen_fd</span><span style="color: #E6DB74;">()</span>;
+        <span style="color: #A6E22E;">}</span>
+        <span style="color: #bb99b4;">rc</span> = <span style="color: #e0a0bc;">udp_adps_</span><span style="color: #A6E22E;">[</span><span style="color: #b6a0e0;">i</span><span style="color: #A6E22E;">]</span>-&gt;<span style="color: #A6E22E;">listen_udp</span><span style="color: #A6E22E;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a7aac0;">listen_ip</span>, <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #e0a0bc;">udp_port</span>, <span style="color: #b3c0a7;">udp_lfd</span><span style="color: #A6E22E;">)</span>;
+        <span style="color: #F92672;">if</span> <span style="color: #A6E22E;">(</span><span style="color: #bb99b4;">rc</span> != <span style="color: #b6a0e0;">TM_SUCCESS</span><span style="color: #A6E22E;">)</span>
+            <span style="color: #F92672;">goto</span> <span style="color: #AE81FF;">err</span>;
+    <span style="color: #66D9EF;">}</span>
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>在每个 TPListenerAdapter 对象的 listen_udp 函数中创建一个 UdpListener，同时绑定到 TPListenerAdapter 对象的线程去</li>
+</ul>
+</div>
+
+<ul class="org-ul">
+<li><a id="orgb116b7e"></a><span class="todo TODO">TODO</span> TPListenerAdapter对象的可读事件哪里注册的？ <code>[0/2]</code><code>[0%]</code><br />
+<div class="outline-text-4" id="text-orgb116b7e">
+<ol class="org-ol">
+<li class="off"><code>[&#xa0;]</code> TPListenerAdapter对象的可读事件是否注册</li>
+<li class="off"><code>[&#xa0;]</code> TPListenerAdapter对象的send_plug什么时候调用</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+<div id="outline-container-org71fe721" class="outline-3">
+<h3 id="org71fe721">tcp监听</h3>
+<div class="outline-text-3" id="text-org71fe721">
+<ul class="org-ul">
+<li>如果 tcp 的监听端口不为0，则创建一个 TPListenerAdapter 对象，同时绑定到一个线程去，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #F92672;">if</span> <span style="color: #AE81FF;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #9999bb;">tcp_port</span> != <span style="color: #AE81FF;">0</span><span style="color: #AE81FF;">)</span> <span style="color: #AE81FF;">{</span>
+    <span style="color: #99bbb4;">iothr</span> = <span style="color: #AE81FF;">EventLoopManager</span>::<span style="color: #A6E22E;">TpInstance</span><span style="color: #66D9EF;">()</span>-&gt;<span style="color: #A6E22E;">GetListenIOThread</span><span style="color: #66D9EF;">(</span><span style="color: #AE81FF;">NULL</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #a6bb99;">tcp_adp_</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">TPListenerAdapter</span><span style="color: #66D9EF;">(</span><span style="color: #F92672;">this</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #a6bb99;">tcp_adp_</span>-&gt;<span style="color: #A6E22E;">set_io_thread</span><span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #bb99b4;">rc</span> = <span style="color: #a6bb99;">tcp_adp_</span>-&gt;<span style="color: #A6E22E;">listen_tcp</span><span style="color: #66D9EF;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a7aac0;">listen_ip</span>, <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #9999bb;">tcp_port</span>, <span style="color: #c0a7bd;">TT_TCP</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #bb99b4;">rc</span> != <span style="color: #b6a0e0;">TM_SUCCESS</span><span style="color: #66D9EF;">)</span>
+        <span style="color: #F92672;">goto</span> <span style="color: #AE81FF;">err</span>;
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>在 TPListenerAdapter 对象的 listen_tcp 函数中创建一个 TcpListener，同时绑定到 TPListenerAdapter 对象的线程去</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga9de03a" class="outline-3">
+<h3 id="orga9de03a">http监听</h3>
+<div class="outline-text-3" id="text-orga9de03a">
+<ul class="org-ul">
+<li>如果 http 的监听端口不为0，同时 http 的监听端口不等于 tcp 的监听端口，则创建一个 TPListenerAdapter 对象，同时绑定到一个线程去，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #75715E;">// </span><span style="color: #75715E;">listen http</span>
+<span style="color: #F92672;">if</span> <span style="color: #AE81FF;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a0d6e0;">http_port</span> != <span style="color: #AE81FF;">0</span> &amp;&amp; <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a0d6e0;">http_port</span> != <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #9999bb;">tcp_port</span><span style="color: #AE81FF;">)</span> <span style="color: #AE81FF;">{</span>
+    <span style="color: #99bbb4;">iothr</span> = <span style="color: #AE81FF;">EventLoopManager</span>::<span style="color: #A6E22E;">TpInstance</span><span style="color: #66D9EF;">()</span>-&gt;<span style="color: #A6E22E;">GetListenIOThread</span><span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #c0afa7;">http_adp_</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">TPListenerAdapter</span><span style="color: #66D9EF;">(</span><span style="color: #F92672;">this</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #c0afa7;">http_adp_</span>-&gt;<span style="color: #A6E22E;">set_io_thread</span><span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #bb99b4;">rc</span> = <span style="color: #c0afa7;">http_adp_</span>-&gt;<span style="color: #A6E22E;">listen_tcp</span><span style="color: #66D9EF;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a7aac0;">listen_ip</span>, <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a0d6e0;">http_port</span>, <span style="color: #c0a7bd;">TT_TCP</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #bb99b4;">rc</span> != <span style="color: #b6a0e0;">TM_SUCCESS</span><span style="color: #66D9EF;">)</span>
+        <span style="color: #F92672;">goto</span> <span style="color: #AE81FF;">err</span>;
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>在 TPListenerAdapter 对象的 listen_tcp 函数中创建一个 TcpListener，同时绑定到 TPListenerAdapter 对象的线程去</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge329ba7" class="outline-3">
+<h3 id="orge329ba7">https监听</h3>
+<div class="outline-text-3" id="text-orge329ba7">
+<ul class="org-ul">
+<li>如果 https 的监听端口不为0，同时 https 的监听端口不等于 http 的监听端口，同时 https 的监听端口不等于 tcp 的监听端口，<br />
+则创建一个 TPListenerAdapter 对象，同时绑定到一个线程去，如下</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #75715E;">// </span><span style="color: #75715E;">listen https</span>
+<span style="color: #F92672;">if</span> <span style="color: #AE81FF;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #e0a0bc;">https_port</span> != <span style="color: #AE81FF;">0</span> &amp;&amp;<span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #e0a0bc;">https_port</span> != <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #9999bb;">tcp_port</span> &amp;&amp; <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #e0a0bc;">https_port</span> != <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a0d6e0;">http_port</span><span style="color: #AE81FF;">)</span> <span style="color: #AE81FF;">{</span>
+    <span style="color: #99bbb4;">iothr</span> = <span style="color: #AE81FF;">EventLoopManager</span>::<span style="color: #A6E22E;">TpInstance</span><span style="color: #66D9EF;">()</span>-&gt;<span style="color: #A6E22E;">GetListenIOThread</span><span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #b3c0a7;">https_adp_</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">TPListenerAdapter</span><span style="color: #66D9EF;">(</span><span style="color: #F92672;">this</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #b3c0a7;">https_adp_</span>-&gt;<span style="color: #A6E22E;">set_io_thread</span><span style="color: #66D9EF;">(</span><span style="color: #99bbb4;">iothr</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #bb99b4;">rc</span> = <span style="color: #b3c0a7;">https_adp_</span>-&gt;<span style="color: #A6E22E;">listen_tcp</span><span style="color: #66D9EF;">(</span><span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #a7aac0;">listen_ip</span>, <span style="color: #b6a0e0;">tp</span>-&gt;<span style="color: #e0a0bc;">https_port</span>, <span style="color: #c0afa7;">TT_SSL</span><span style="color: #66D9EF;">)</span>;
+    <span style="color: #F92672;">if</span> <span style="color: #66D9EF;">(</span><span style="color: #bb99b4;">rc</span> != <span style="color: #b6a0e0;">TM_SUCCESS</span><span style="color: #66D9EF;">)</span>
+        <span style="color: #F92672;">goto</span> <span style="color: #AE81FF;">err</span>;
+<span style="color: #AE81FF;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>在 TPListenerAdapter 对象的 listen_tcp 函数中创建一个 TcpListener，同时绑定到 TPListenerAdapter 对象的线程去</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org8975c28" class="outline-2">
+<h2 id="org8975c28">UdpListener::HandleInput逻辑</h2>
+</div>
+<div id="outline-container-orge9256cf" class="outline-2">
+<h2 id="orge9256cf">TcpListener::HandleInput逻辑</h2>
+</div>
